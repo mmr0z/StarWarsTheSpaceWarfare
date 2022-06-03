@@ -4,7 +4,11 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp
+        bullet.cpp \
+        button.cpp \
+        main.cpp \
+        normalshot.cpp \
+        player.cpp
 
 INCLUDEPATH += "C:/SFML-2.5.1/include"
 
@@ -14,3 +18,9 @@ CONFIG(debug, debug|release){
 } else {
     LIBS += -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window
 }
+
+HEADERS += \
+    bullet.h \
+    button.h \
+    normalshot.h \
+    player.h
