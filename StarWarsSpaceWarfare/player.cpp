@@ -26,6 +26,16 @@ void Player::ChangeTexture(sf::Texture &texture){
     this->setTexture(texture);
 }
 
+void Player::TogglePowerUp(sf::Texture &texture_power_up, sf::Texture &texture){
+    power_up = !power_up;
+    if(power_up){
+        setTexture(texture_power_up);
+    }
+    else {
+        setTexture(texture);
+    }
+}
+
 int Player::GetLives(){
     return lives;
 }

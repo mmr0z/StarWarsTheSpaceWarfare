@@ -10,6 +10,7 @@ public:
     void SetSpeed(double sx, double sy);
     void BorderLimit(sf::RenderWindow &window);
     void ChangeTexture(sf::Texture &texture);
+    void TogglePowerUp(sf::Texture &texture_power_up, sf::Texture &texture);
 
     int GetLives();
     int GetPoints();
@@ -21,4 +22,5 @@ protected:
     int points;
     double speed_x;
     double speed_y;
+    bool power_up = false;
 };
