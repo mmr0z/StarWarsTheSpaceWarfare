@@ -1,6 +1,7 @@
 #include "button.h"
 #include "normalshot.h"
 #include "player.h"
+#include "tiefighter.h"
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
@@ -8,7 +9,7 @@
 
 void Game(){
     // create the window
-
+    // SOUND
     sf::SoundBuffer buffer_shot;
     if(!buffer_shot.loadFromFile("samples/x_wing_shot.wav")){
         std::cerr<<"blad ladowania x_wing_shot.wav"<<std::endl;
@@ -43,18 +44,35 @@ void Game(){
 
     Player player(texture_x_wing);
     player.setOrigin(player.getGlobalBounds().width/2, player.getGlobalBounds().height/2);
-    player.setPosition(window.getSize().x/2, window.getSize().y/2);
+    player.setPosition(window.getSize().x/2, window.getSize().y/2 + 200);
     player.setScale(0.1, 0.1);
+
+    // OPPONENTS
+    sf::Texture texture_tie_fighter;
+    if(!texture_tie_fighter.loadFromFile("textures/tie_fighter.png")){
+        std::cerr<<"blad ladowania texture_tie_fighter.png"<<std::endl;
+    }
+
+    std::vector<std::unique_ptr<Opponents>> opponents;
+    for(int i=0; i<10; i++){
+        auto temp = std::make_unique<TieFighter>(texture_tie_fighter);
+        temp->setPosition(rand()%(window.getSize().x-50), 0);
+        temp->setScale(0.12, 0.12);
+        opponents.emplace_back(std::move(temp));
+    }
 
     // BACKGROUND
     sf::Texture texture_background;
     if(!texture_background.loadFromFile("textures/background1.png")){
         std::cerr<<"blad ladowania background.png"<<std::endl;
     }
-    texture_background.setRepeated(false);
+    texture_background.setRepeated(true);
 
     sf::Sprite background(texture_background);
-    background.setTextureRect(sf::IntRect(0, 0, window.getSize().x, window.getSize().y));
+    background.setTextureRect(sf::IntRect(0, 0, 10*window.getSize().x, 10*window.getSize().y));
+//    background.setScale(0.5, 0.5);
+    background.setPosition(window.getSize().x, window.getSize().y);
+    background.setRotation(180);
 
     sf::Texture texture_normal_shot_green;
     if(!texture_normal_shot_green.loadFromFile("textures/shot_green.png")){
@@ -102,6 +120,7 @@ void Game(){
                 }
             }
         }
+
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             player.move(-player.GetSpeedX()*elapsed, 0);
         }
@@ -124,7 +143,6 @@ void Game(){
                 }
                 bullets.emplace_back(std::move(temp));
                 elapsedShot = 0;
-
             }
         }
 
@@ -134,8 +152,10 @@ void Game(){
             player.move(0, 100*elapsed);
         }
 
+        background.move(0, 15*elapsed);
+
         for(auto it=bullets.begin(); it!=bullets.end();){
-            if((*it)->getGlobalBounds().top + (*it)->getGlobalBounds().height < 0){
+            if((*it)->getGlobalBounds().top + (*it)->getGlobalBounds().height < -100){
                 NormalShot *normalShot = dynamic_cast<NormalShot*>(it->get());
                 if(normalShot!=nullptr){
                     it = bullets.erase(it);
@@ -151,7 +171,52 @@ void Game(){
             (*it)->Move(elapsed);
         }
 
-        //        std::cout<<1.f/elapsed<<std::endl;
+
+
+        for(auto it=opponents.begin(); it!=opponents.end();){
+            TieFighter *tiefighter = dynamic_cast<TieFighter*>(it->get());
+            tiefighter->Movement(window, elapsed);
+            if(tiefighter!=nullptr){
+                for(auto itr=bullets.begin(); itr!=bullets.end();){
+                    NormalShot *normalshot = dynamic_cast<NormalShot*>(itr->get());
+                    if(normalshot!=nullptr){
+                        if(normalshot->getGlobalBounds().intersects(tiefighter->getGlobalBounds())){
+                            tiefighter->LostHP(25);
+                            itr = bullets.erase(itr);
+                            std::cout<<"BOOM"<<std::endl;
+                        }
+                        else{
+                            itr++;
+                        }
+                    }
+                    else{
+                        itr++;
+                    }
+                }
+                it++;
+            }
+            else{
+                it++;
+            }
+        }
+
+        for(auto it=opponents.begin(); it!=opponents.end();){
+            TieFighter *tiefighter = dynamic_cast<TieFighter*>(it->get());
+            if(tiefighter!=nullptr){
+                tiefighter->Movement(window, elapsed);
+                if(tiefighter->GetHP() <= 0){
+                    it = opponents.erase(it);
+                }
+                else{
+                    it++;
+                }
+            }
+            else {
+                it++;
+            }
+        }
+
+        //std::cout<<1.f/elapsed<<std::endl;
 
         // clear the window with black color / background image
         //window.clear(sf::Color::Black);
@@ -160,6 +225,10 @@ void Game(){
         // DRAW
         // draw everything here...
         for(auto &el: bullets){
+            window.draw(*el);
+        }
+
+        for(auto &el: opponents){
             window.draw(*el);
         }
 

@@ -8,7 +8,9 @@ SOURCES += \
         button.cpp \
         main.cpp \
         normalshot.cpp \
-        player.cpp
+        opponents.cpp \
+        player.cpp \
+        tiefighter.cpp
 
 INCLUDEPATH += "C:/SFML-2.5.1/include"
 
@@ -23,4 +25,6 @@ HEADERS += \
     bullet.h \
     button.h \
     normalshot.h \
-    player.h
+    opponents.h \
+    player.h \
+    tiefighter.h
