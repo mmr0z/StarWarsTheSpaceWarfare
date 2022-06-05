@@ -2,7 +2,7 @@
 
 Bullet::Bullet()
 {
-    this->speed_y = 700;
+    this->speed_y = 0;
 }
 
 void Bullet::SetSpeed(double sx, double sy){
