@@ -10,6 +10,7 @@ SOURCES += \
         normalshot.cpp \
         opponents.cpp \
         player.cpp \
+        protonbomb.cpp \
         tiefighter.cpp
 
 INCLUDEPATH += "C:/SFML-2.5.1/include"
@@ -27,4 +28,5 @@ HEADERS += \
     normalshot.h \
     opponents.h \
     player.h \
+    protonbomb.h \
     tiefighter.h

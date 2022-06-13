@@ -7,6 +7,10 @@ class Opponents : public sf::Sprite
 public:
     Opponents();
     void Movement(sf::RenderWindow &window, double elapsed);
+    void HP();
+    sf::RectangleShape hp_bar;
+    int GetHP();
+    void HPdraw();
 protected:
     int hp;
     int points;

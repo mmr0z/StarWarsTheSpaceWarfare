@@ -10,5 +10,7 @@ public:
 
     void Movement(sf::RenderWindow &window, double elapsed);
     void LostHP(int x);
+    void HP();
     int GetHP();
+    void HPdraw();
 };
