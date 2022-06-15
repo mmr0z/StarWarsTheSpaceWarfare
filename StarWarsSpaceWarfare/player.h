@@ -11,7 +11,10 @@ public:
     void BorderLimit(sf::RenderWindow &window);
     void ChangeTexture(sf::Texture &texture);
     void TogglePowerUp(sf::Texture &texture_power_up, sf::Texture &texture);
+    void AddPoints(int x);
+    void AddProtonBomb(int x);
 
+    int GetProtonBomb();
     int GetLives();
     int GetPoints();
     double GetSpeedX();
@@ -20,6 +23,7 @@ public:
 protected:
     int lives;
     int points;
+    int proton_bomb_counter;
     double speed_x;
     double speed_y;
     bool power_up = false;

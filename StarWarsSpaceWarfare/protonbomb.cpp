@@ -9,7 +9,7 @@ ProtonBomb::ProtonBomb(sf::Texture &texture, Player &player)
 
 void ProtonBomb::ShootToTarget(Player &player, sf::RenderWindow &window, double elapsed){
     this->speed_x = 500;
-    this->speed_y = -500;
+    this->speed_y = -300;
 
     sf::Vector2f pos_m = window.mapPixelToCoords(sf::Mouse::getPosition(window));
     sf::Vector2f pos_s = player.getPosition();

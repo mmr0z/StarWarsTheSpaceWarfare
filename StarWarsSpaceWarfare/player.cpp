@@ -6,6 +6,8 @@ Player::Player(sf::Texture &texture){
     setTexture(texture);
 
     this->SetSpeed(300, 300); /////////
+    this->points = 0;
+    this->proton_bomb_counter = 0;
 }
 
 void Player::SetSpeed(double sx, double sy){
@@ -36,6 +38,14 @@ void Player::TogglePowerUp(sf::Texture &texture_power_up, sf::Texture &texture){
     }
 }
 
+void Player::AddPoints(int x){
+    this->points += x;
+}
+
+void Player::AddProtonBomb(int x){
+    this->proton_bomb_counter += x;
+}
+
 int Player::GetLives(){
     return lives;
 }
@@ -50,4 +60,8 @@ double Player::GetSpeedX(){
 
 double Player::GetSpeedY(){
     return speed_y;
+}
+
+int Player::GetProtonBomb(){
+    return proton_bomb_counter;
 }
