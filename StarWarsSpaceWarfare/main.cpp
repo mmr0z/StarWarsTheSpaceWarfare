@@ -9,6 +9,42 @@
 #include <iostream>
 #include <cmath>
 
+void About(){
+    sf::Font font;
+    if(!font.loadFromFile("fonts/Starjedi.ttf")){
+        std::cerr<<"blad ladowania Starjedi.ttf"<<std::endl;
+    }
+
+    sf::RenderWindow window(sf::VideoMode(420, 175), "Star Wars - The Space warfare", sf::Style::Titlebar | sf::Style::Close);
+    window.setFramerateLimit(60);
+
+    Button author;
+    author.setFont(font);
+    author.setFillColor(sf::Color::Black);
+    author.setOutlineColor(sf::Color::White);
+    author.setOutlineThickness(0.8);
+    author.setString("author: maciej mroz \nindex: 151241 \npolitechnika poznanska \nair 2022, 2nd semester");
+    author.setCharacterSize(25);
+    author.setPosition(10, 10);
+
+    while(window.isOpen()) {
+
+        // check all the window's events that were triggered since the last iteration of the loop
+        sf::Event event;
+
+        while(window.pollEvent(event)) {
+            // "close requested" event: we close the window
+            if(event.type == sf::Event::Closed){
+                window.close();
+            }
+        }
+        window.clear(sf::Color::Black);
+
+        window.draw(author);
+
+        window.display();
+    }
+}
 void Shop(Player &player){
     sf::Font font;
     if(!font.loadFromFile("fonts/Starjedi.ttf")){
@@ -390,6 +426,10 @@ void Game(){
             // LOGIC
             player.BorderLimit(window);
 
+            if(player.GetHP() <= 100){
+                player.setTexture(texture_x_wing_destroyed);
+            }
+
             if(player.getPosition().y < 500){
                 player.move(0, 100*elapsed);
             }
@@ -537,6 +577,18 @@ void Game(){
             }
         }
 
+        if(deathstar.GetHP() <= 0){
+            pause = true;
+            pause_text.setString("you win!");
+            pause_text.setPosition(380, 245);
+        }
+
+        if(player.GetHP() <= 0){
+            pause = true;
+            pause_text.setString("you lost!");
+            pause_text.setPosition(370, 245);
+        }
+
         // clear the window with black color / background image
         //window.clear(sf::Color::Black);
         window.draw(background);
@@ -594,7 +646,7 @@ void MainMenu(){
     sf::Sound theme;
     theme.setBuffer(buffer);
     theme.play();
-    theme.setVolume(5); // zmienic na 10
+    theme.setVolume(5);
 
     sf::Font font;
     if(!font.loadFromFile("fonts/Starjedi.ttf")){
@@ -671,6 +723,9 @@ void MainMenu(){
                 && (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y > about.getPosition().y)
                 && (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y < about.getPosition().y + about.getGlobalBounds().height)){
             about.setFillColor(sf::Color(241, 212, 0));
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+                About();
+            }
         }
         else {
             about.setFillColor(sf::Color::White);
