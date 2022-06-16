@@ -10,6 +10,7 @@ public:
     void HP();
     sf::RectangleShape hp_bar;
     int GetHP();
+    virtual void LostHP(int x);
     void HPdraw();
 protected:
     int hp;

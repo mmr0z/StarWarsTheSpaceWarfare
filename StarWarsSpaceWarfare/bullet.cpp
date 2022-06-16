@@ -16,15 +16,16 @@ void Bullet::Shoot(double elapsed){
 }
 
 void Bullet::ShootLeft(double elapsed, Player &player){
-    setPosition(player.getPosition().x - 30, player.getPosition().y - 40);
-    Shoot(elapsed);
+    this->setPosition(player.getPosition().x - 30, player.getPosition().y - 40);
+    this->Shoot(elapsed);
 }
 
 void Bullet::ShootRight(double elapsed, Player &player){
-    setPosition(player.getPosition().x + 30, player.getPosition().y - 40);
-    Shoot(elapsed);
+    this->setPosition(player.getPosition().x + 30, player.getPosition().y - 40);
+    this->Shoot(elapsed);
 }
 
-void Bullet::ShootToTarget(){
-
+void Bullet::ShootLaser(double elapsed, DeathStar &deathstar){
+    this->setPosition(deathstar.getPosition().x + 40, deathstar.getPosition().y - 40);
+    this->Shoot(elapsed);
 }

@@ -10,5 +10,6 @@ public:
     NormalShot(sf::Texture &texture);
     void ShootLeft(Player &player);
     void ShootRight(Player &player);
+    void ShootLaser(DeathStar &deathstar);
 };
 

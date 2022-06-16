@@ -9,9 +9,13 @@ NormalShot::NormalShot(sf::Texture &texture){
 }
 
 void NormalShot::ShootLeft(Player &player){
-    setPosition(player.getPosition().x - 33, player.getPosition().y - 20);
+    this->setPosition(player.getPosition().x - 33, player.getPosition().y - 20);
 }
 
 void NormalShot::ShootRight(Player &player){
-    setPosition(player.getPosition().x + 25, player.getPosition().y - 20);
+    this->setPosition(player.getPosition().x + 25, player.getPosition().y - 20);
+}
+
+void NormalShot::ShootLaser(DeathStar &deathstar){
+    this->setPosition(deathstar.getPosition().x + 44, deathstar.getPosition().y + 40);
 }

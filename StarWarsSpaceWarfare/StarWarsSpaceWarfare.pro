@@ -6,6 +6,7 @@ CONFIG -= qt
 SOURCES += \
         bullet.cpp \
         button.cpp \
+        deathstar.cpp \
         main.cpp \
         normalshot.cpp \
         opponents.cpp \
@@ -25,6 +26,7 @@ CONFIG(debug, debug|release){
 HEADERS += \
     bullet.h \
     button.h \
+    deathstar.h \
     normalshot.h \
     opponents.h \
     player.h \

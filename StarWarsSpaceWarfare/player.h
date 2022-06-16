@@ -12,16 +12,17 @@ public:
     void ChangeTexture(sf::Texture &texture);
     void TogglePowerUp(sf::Texture &texture_power_up, sf::Texture &texture);
     void AddPoints(int x);
+    void AddHP(int x);
     void AddProtonBomb(int x);
 
     int GetProtonBomb();
-    int GetLives();
+    int GetHP();
     int GetPoints();
     double GetSpeedX();
     double GetSpeedY();
 
 protected:
-    int lives;
+    int hp;
     int points;
     int proton_bomb_counter;
     double speed_x;

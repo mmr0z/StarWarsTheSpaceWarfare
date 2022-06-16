@@ -8,6 +8,7 @@ Player::Player(sf::Texture &texture){
     this->SetSpeed(300, 300); /////////
     this->points = 0;
     this->proton_bomb_counter = 0;
+    this->hp = 250;
 }
 
 void Player::SetSpeed(double sx, double sy){
@@ -42,12 +43,16 @@ void Player::AddPoints(int x){
     this->points += x;
 }
 
+void Player::AddHP(int x){
+    this->hp += x;
+}
+
 void Player::AddProtonBomb(int x){
     this->proton_bomb_counter += x;
 }
 
-int Player::GetLives(){
-    return lives;
+int Player::GetHP(){
+    return hp;
 }
 
 int Player::GetPoints(){

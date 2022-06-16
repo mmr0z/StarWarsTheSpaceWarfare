@@ -8,7 +8,7 @@ ProtonBomb::ProtonBomb(sf::Texture &texture, Player &player)
 }
 
 void ProtonBomb::ShootToTarget(Player &player, sf::RenderWindow &window, double elapsed){
-    this->speed_x = 500;
+    this->speed_x = 300;
     this->speed_y = -300;
 
     sf::Vector2f pos_m = window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -16,6 +16,6 @@ void ProtonBomb::ShootToTarget(Player &player, sf::RenderWindow &window, double 
     sf::Vector2f diff = pos_m - pos_s;
     double normalizer = sqrt(pow(diff.x, 2) + pow(diff.y, 2));
     if((std::abs(diff.x)>2) && (std::abs(diff.y)>2)){
-        this->move(((diff.x)*speed_x/normalizer)*elapsed, (diff.y*speed_y/normalizer)*elapsed);
+        this->move(((diff.x)*speed_x/normalizer)*elapsed, speed_y*elapsed);
     }
 }

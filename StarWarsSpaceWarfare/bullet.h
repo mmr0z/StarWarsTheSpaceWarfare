@@ -1,4 +1,5 @@
 #pragma once
+#include "deathstar.h"
 #include "player.h"
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -12,8 +13,7 @@ public:
     void SetSpeed(double sx, double sy);
     void ShootLeft(double elapsed, Player &player);
     void ShootRight(double elapsed, Player &player);
-    void ShootToTarget();
-
+    void ShootLaser(double elapsed, DeathStar &deathstar);
 protected:
     double speed_x;
     double speed_y;

@@ -140,59 +140,6 @@ void Shop(Player &player){
         window.display();
     }
 }
-void Options(sf::Sound &theme){
-    // create the window
-    sf::RenderWindow window(sf::VideoMode(400, 400), "Star Wars - The Space warfare", sf::Style::Titlebar | sf::Style::Close);
-    window.setFramerateLimit(60);
-
-    sf::Texture texture_vol_off;
-    if(!texture_vol_off.loadFromFile("textures/speakersOff.png")){
-        std::cerr<<"Blad ladowania volumeOff.png"<<std::endl;
-    }
-
-    sf::Sprite volumeOff;
-    volumeOff.setTexture(texture_vol_off);
-    volumeOff.setPosition(300, 300);
-    volumeOff.setScale(0.25,0.25);
-
-
-    while(window.isOpen()) {
-        // check all the window's events that were triggered since the last iteration of the loop
-        sf::Event event;
-
-        while(window.pollEvent(event)) {
-            // "close requested" event: we close the window
-            if(event.type == sf::Event::Closed){
-                window.close();
-            }
-        }
-
-        // LOGIC
-        if((window.mapPixelToCoords(sf::Mouse::getPosition(window)).x < volumeOff.getPosition().x + volumeOff.getGlobalBounds().width)
-                && (window.mapPixelToCoords(sf::Mouse::getPosition(window)).x > volumeOff.getPosition().x)
-                && (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y > volumeOff.getPosition().y)
-                && (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y < volumeOff.getPosition().y + volumeOff.getGlobalBounds().height)){
-            volumeOff.setColor(sf::Color::Red);
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-                window.close();
-                theme.setVolume(0);
-            }
-        }
-        else {
-            volumeOff.setColor(sf::Color::Black);
-        }
-
-        // clear the window with black color / background image
-        window.clear(sf::Color::White);
-
-        // DRAW
-        // draw everything here...
-        window.draw(volumeOff);
-
-        // end the current frame
-        window.display();
-    }
-}
 void Game(){
     // create the window
     // SOUND
@@ -201,6 +148,20 @@ void Game(){
         std::cerr<<"blad ladowania x_wing_shot.wav"<<std::endl;
     }
 
+    sf::SoundBuffer buffer_death_star_shot;
+    if(!buffer_death_star_shot.loadFromFile("samples/death_star_shot.wav")){
+        std::cerr<<"blad ladowania death_star_shot.wav"<<std::endl;
+    }
+
+    sf::SoundBuffer buffer_proton_bomb_explosion;
+    if(!buffer_proton_bomb_explosion.loadFromFile("samples/proton_bomb_explosion.wav")){
+        std::cerr<<"blad ladowania proton_bomb_explosion.wav"<<std::endl;
+    }
+
+    sf::Sound proton_explosion;
+    proton_explosion.setBuffer(buffer_proton_bomb_explosion);
+    proton_explosion.setVolume(10);
+
     sf::Sound shot_right;
     shot_right.setBuffer(buffer_shot);
     shot_right.setVolume(10);
@@ -208,6 +169,10 @@ void Game(){
     sf::Sound shot_left;
     shot_left.setBuffer(buffer_shot);
     shot_left.setVolume(10);
+
+    sf::Sound death_star_shot;
+    death_star_shot.setBuffer(buffer_death_star_shot);
+    death_star_shot.setVolume(10);
 
     sf::Font font;
     if(!font.loadFromFile("fonts/Starjedi.ttf")){
@@ -241,17 +206,24 @@ void Game(){
     // OPPONENTS
     sf::Texture texture_tie_fighter;
     if(!texture_tie_fighter.loadFromFile("textures/tie_fighter.png")){
-        std::cerr<<"blad ladowania texture_tie_fighter.png"<<std::endl;
+        std::cerr<<"blad ladowania tie_fighter.png"<<std::endl;
     }
+
+    sf::Texture texture_death_star;
+    if(!texture_death_star.loadFromFile("textures/death_star.png")){
+        std::cerr<<"blad ladowania death_star.png"<<std::endl;
+    }
+
+    DeathStar deathstar(texture_death_star);
 
     std::vector<std::unique_ptr<Opponents>> opponents;
 
-    for(int i=0; i<10; i++){
-        auto temp = std::make_unique<TieFighter>(texture_tie_fighter);
-        temp->setPosition(10 + rand()%(window.getSize().x-50), -50);
-        temp->setScale(0.12, 0.12);
-        opponents.emplace_back(std::move(temp));
-    }
+//    for(int i=0; i<10; i++){
+//        auto temp = std::make_unique<TieFighter>(texture_tie_fighter);
+//        temp->setPosition(10 + rand()%(window.getSize().x-50), -50);
+//        temp->setScale(0.12, 0.12);
+//        opponents.emplace_back(std::move(temp));
+//    }
 
     Button pause_text;
     pause_text.setFont(font);
@@ -270,6 +242,15 @@ void Game(){
     points_text.setString(std::to_string(player.GetPoints()));
     points_text.setCharacterSize(25);
     points_text.setPosition(10, 10);
+
+    Button HP_text;
+    HP_text.setFont(font);
+    HP_text.setFillColor(sf::Color::Black);
+    HP_text.setOutlineColor(sf::Color::White);
+    HP_text.setOutlineThickness(0.8);
+    HP_text.setString(std::to_string(player.GetHP()));
+    HP_text.setCharacterSize(25);
+    HP_text.setPosition(900, 10);
 
     // BACKGROUND
     sf::Texture texture_background;
@@ -299,12 +280,16 @@ void Game(){
     }
 
     std::vector<std::unique_ptr<Bullet>> bullets;
+    std::vector<std::unique_ptr<Bullet>> bulletsDeathStar;
 
     // CLOCKS
     sf::Clock clock;
+    sf::Clock timer;
     double elapsed = 0;
     double elapsedShot = 0;
     double elapsedShotProtonBomb = 0;
+    double elapsedDeathStarShot = 0;
+    double elapsedInterval = 0;
 
     enum{
         left_gun,
@@ -322,6 +307,8 @@ void Game(){
         elapsed = clock.restart().asSeconds();
         elapsedShot += elapsed;
         elapsedShotProtonBomb += elapsed;
+        elapsedDeathStarShot += elapsed;
+        elapsedInterval += elapsed;
 
         while(window.pollEvent(event)) {
             // "close requested" event: we close the window
@@ -331,7 +318,7 @@ void Game(){
 
             if(event.type == sf::Event::KeyReleased){
                 if(event.key.code == sf::Keyboard::P){
-                    pause=true;
+                    pause = true;
                     Shop(player);
                 }
             }
@@ -343,6 +330,7 @@ void Game(){
         }
 
         points_text.setString(std::to_string(player.GetPoints()));
+        HP_text.setString(std::to_string(player.GetHP()));
 
         //
         if(!pause){
@@ -385,6 +373,20 @@ void Game(){
                 }
             }
 
+            if(elapsedInterval > 2){
+                if(elapsedDeathStarShot > 0.005){
+                    auto temp = std::make_unique<NormalShot>(texture_normal_shot_green);
+                    temp->SetSpeed(0, 500);
+                    temp->ShootLaser(deathstar);
+                    bulletsDeathStar.emplace_back(std::move(temp));
+                    elapsedDeathStarShot = 0;
+                    if(elapsedInterval > 2.5){
+                        elapsedInterval = 0;
+                        death_star_shot.play();
+                    }
+                }
+            }
+
             // LOGIC
             player.BorderLimit(window);
 
@@ -395,7 +397,7 @@ void Game(){
             background.move(0, 15*elapsed);
 
             for(auto it=bullets.begin(); it!=bullets.end();){
-                if((*it)->getGlobalBounds().top + (*it)->getGlobalBounds().height < -100){
+                if((*it)->getGlobalBounds().top + (*it)->getGlobalBounds().height < -20){
                     NormalShot *normalShot = dynamic_cast<NormalShot*>(it->get());
                     ProtonBomb *protonBomb = dynamic_cast<ProtonBomb*>(it->get());
                     if(normalShot!=nullptr){
@@ -411,8 +413,50 @@ void Game(){
                 }
             }
 
+            for(auto it=bulletsDeathStar.begin(); it!=bulletsDeathStar.end();){
+                if((*it)->getGlobalBounds().top > 600){
+                    NormalShot *normalShot = dynamic_cast<NormalShot*>(it->get());
+                    if(normalShot!=nullptr){
+                        it = bulletsDeathStar.erase(it);
+                    }
+                    else{
+
+                    }
+                }
+                else{
+                    it++;
+                }
+            }
+
+            for(auto it=bulletsDeathStar.begin(); it!=bulletsDeathStar.end();){
+                if((*it)->getGlobalBounds().intersects(player.getGlobalBounds())){
+                    NormalShot *normalShot = dynamic_cast<NormalShot*>(it->get());
+                    if(normalShot!=nullptr){
+                        it = bulletsDeathStar.erase(it);
+                        player.AddHP(-1);
+                    }
+                    else{
+
+                    }
+                }
+                else{
+                    it++;
+                }
+            }
+
+            for(auto &el: bulletsDeathStar){
+                el->Shoot(elapsed);
+            }
+
             for(auto it=bullets.begin(); it!=bullets.end(); it++){
-                (*it)->Shoot(elapsed);
+                NormalShot *normalShot = dynamic_cast<NormalShot*>(it->get());
+                ProtonBomb *protonBomb = dynamic_cast<ProtonBomb*>(it->get());
+                if(normalShot!=nullptr){
+                    normalShot->Shoot(elapsed);
+                }
+                else if(protonBomb!=nullptr){
+                    protonBomb->ShootToTarget(player, window, elapsed);
+                }
             }
 
             for(auto it=opponents.begin(); it!=opponents.end();){
@@ -427,6 +471,10 @@ void Game(){
                                 tiefighter->LostHP(20+rand()%10);
                                 itr = bullets.erase(itr);
                             }
+                            else if(normalshot->getGlobalBounds().intersects(deathstar.getGlobalBounds())){
+                                deathstar.LostHP(3);
+                                itr = bullets.erase(itr);
+                            }
                             else{
                                 itr++;
                             }
@@ -434,6 +482,12 @@ void Game(){
                         else if(protonbomb!=nullptr){
                             if(protonbomb->getGlobalBounds().intersects(tiefighter->getGlobalBounds())){
                                 tiefighter->LostHP(50);
+                                proton_explosion.play();
+                                itr = bullets.erase(itr);
+                            }
+                            else if(protonbomb->getGlobalBounds().intersects(deathstar.getGlobalBounds())){
+                                deathstar.LostHP(30);
+                                proton_explosion.play();
                                 itr = bullets.erase(itr);
                             }
                             else{
@@ -461,6 +515,7 @@ void Game(){
                     }
                     else if(tiefighter->getPosition().y > window.getSize().y){
                         it = opponents.erase(it);
+                        player.AddHP(-10);
                     }
                     else{
                         it++;
@@ -470,6 +525,7 @@ void Game(){
                     it++;
                 }
             }
+            deathstar.Bounce(window, elapsed);
         }
 
         if(opponents.empty()){
@@ -487,11 +543,19 @@ void Game(){
 
         // DRAW
         // draw everything here...
-        for(auto &el: bullets){
+        window.draw(deathstar);
+        deathstar.HPdraw();
+        window.draw(deathstar.hp_bar);
+        window.draw(player);
+
+        for(auto &el: bulletsDeathStar){
+            window.draw(*el);
+        }
+        for(auto &el: opponents){
             window.draw(*el);
         }
 
-        for(auto &el: opponents){
+        for(auto &el: bullets){
             window.draw(*el);
         }
 
@@ -500,12 +564,12 @@ void Game(){
             window.draw(el->hp_bar);
         }
 
-        window.draw(player);
         if(pause){
             window.draw(pause_text);
         }
 
         window.draw(points_text);
+        window.draw(HP_text);
 
         // end the current frame
         window.display();
@@ -566,16 +630,6 @@ void MainMenu(){
     play.setCharacterSize(50);
     play.setPosition(650, 300);
 
-    //Options button
-    Button options;
-    options.setFont(font);
-    options.setFillColor(sf::Color::White);
-    options.setOutlineColor(sf::Color::Black);
-    options.setOutlineThickness(0.5);
-    options.setString("options");
-    options.setCharacterSize(50);
-    options.setPosition(650, 370);
-
     //About button
     Button about;
     about.setFont(font);
@@ -584,7 +638,7 @@ void MainMenu(){
     about.setOutlineThickness(0.5);
     about.setString("about");
     about.setCharacterSize(50);
-    about.setPosition(650, 440);
+    about.setPosition(650, 370);
 
     while(window.isOpen()) {
         // check all the window's events that were triggered since the last iteration of the loop
@@ -612,20 +666,6 @@ void MainMenu(){
             play.setFillColor(sf::Color::White);
         }
 
-        if((window.mapPixelToCoords(sf::Mouse::getPosition(window)).x < options.getPosition().x + options.getGlobalBounds().width)
-                && (window.mapPixelToCoords(sf::Mouse::getPosition(window)).x > options.getPosition().x)
-                && (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y > options.getPosition().y)
-                && (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y < options.getPosition().y + options.getGlobalBounds().height)){
-            options.setFillColor(sf::Color(241, 212, 0));
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-                window.close();
-                Options(theme);
-            }
-        }
-        else {
-            options.setFillColor(sf::Color::White);
-        }
-
         if((window.mapPixelToCoords(sf::Mouse::getPosition(window)).x < about.getPosition().x + about.getGlobalBounds().width)
                 && (window.mapPixelToCoords(sf::Mouse::getPosition(window)).x > about.getPosition().x)
                 && (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y > about.getPosition().y)
@@ -645,7 +685,6 @@ void MainMenu(){
         window.draw(logo_star_wars);
         window.draw(logo_the_space);
         window.draw(play);
-        window.draw(options);
         window.draw(about);
 
         // end the current frame
