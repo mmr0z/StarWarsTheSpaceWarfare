@@ -8,7 +8,7 @@ Player::Player(sf::Texture &texture){
     this->SetSpeed(300, 300); /////////
     this->points = 0;
     this->proton_bomb_counter = 0;
-    this->hp = 250;
+    this->hp = 200;
 }
 
 void Player::SetSpeed(double sx, double sy){

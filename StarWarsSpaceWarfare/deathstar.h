@@ -8,4 +8,5 @@ public:
     void Bounce(sf::RenderWindow &window, double elapsed);
     void HP();
     void HPdraw();
+    void SetHP(int x);
 };

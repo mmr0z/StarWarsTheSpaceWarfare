@@ -219,7 +219,6 @@ void Game(){
     window.setFramerateLimit(60);
 
     // create some objects
-
     // PLAYER
     sf::Texture texture_x_wing;
     if(!texture_x_wing.loadFromFile("textures/x_wing.png")){
@@ -288,6 +287,24 @@ void Game(){
     HP_text.setCharacterSize(25);
     HP_text.setPosition(900, 10);
 
+    Button HP;
+    HP.setFont(font);
+    HP.setFillColor(sf::Color::Black);
+    HP.setOutlineColor(sf::Color::White);
+    HP.setOutlineThickness(0.8);
+    HP.setString("hp:");
+    HP.setCharacterSize(25);
+    HP.setPosition(820, 10);
+
+    Button proton_text;
+    proton_text.setFont(font);
+    proton_text.setFillColor(sf::Color::Black);
+    proton_text.setOutlineColor(sf::Color::White);
+    proton_text.setOutlineThickness(0.8);
+    proton_text.setString(std::to_string(player.GetProtonBomb()));
+    proton_text.setCharacterSize(25);
+    proton_text.setPosition(100, 495);
+
     // BACKGROUND
     sf::Texture texture_background;
     if(!texture_background.loadFromFile("textures/background1.png")){
@@ -315,6 +332,14 @@ void Game(){
         std::cerr<<"blad ladowania proton_bomb.png"<<std::endl;
     }
 
+    const sf::Texture *pTexture_proton = &texture_proton_bomb;
+    sf::RectangleShape proton_image;
+    proton_image.setTexture(pTexture_proton);
+    proton_image.setRotation(270);
+    proton_image.setPosition(20, 520);
+    proton_image.setSize(sf::Vector2f(30, 114));
+    proton_image.setScale(0.5, 0.50);
+
     std::vector<std::unique_ptr<Bullet>> bullets;
     std::vector<std::unique_ptr<Bullet>> bulletsDeathStar;
 
@@ -326,6 +351,8 @@ void Game(){
     double elapsedShotProtonBomb = 0;
     double elapsedDeathStarShot = 0;
     double elapsedInterval = 0;
+    double tempDSS = 0;
+    double tempI = 0;
 
     enum{
         left_gun,
@@ -346,6 +373,7 @@ void Game(){
         elapsedDeathStarShot += elapsed;
         elapsedInterval += elapsed;
 
+
         while(window.pollEvent(event)) {
             // "close requested" event: we close the window
             if(event.type == sf::Event::Closed){
@@ -361,15 +389,21 @@ void Game(){
             if(event.type == sf::Event::KeyReleased){
                 if(event.key.code == sf::Keyboard::Enter){
                     pause=!pause;
+                    elapsedDeathStarShot = tempDSS;
+                    elapsedInterval = tempI;
                 }
             }
         }
 
         points_text.setString(std::to_string(player.GetPoints()));
         HP_text.setString(std::to_string(player.GetHP()));
+        proton_text.setString(std::to_string(player.GetProtonBomb()));
 
         //
         if(!pause){
+            tempDSS = elapsedDeathStarShot;
+            tempI = elapsedInterval;
+
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
                 player.move(-player.GetSpeedX()*elapsed, 0);
             }
@@ -578,9 +612,10 @@ void Game(){
         }
 
         if(deathstar.GetHP() <= 0){
-            pause = true;
+            deathstar.SetHP(0);
             pause_text.setString("you win!");
             pause_text.setPosition(380, 245);
+            pause = true;
         }
 
         if(player.GetHP() <= 0){
@@ -622,6 +657,9 @@ void Game(){
 
         window.draw(points_text);
         window.draw(HP_text);
+        window.draw(proton_image);
+        window.draw(proton_text);
+        window.draw(HP);
 
         // end the current frame
         window.display();

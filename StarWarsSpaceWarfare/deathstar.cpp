@@ -18,6 +18,7 @@ void DeathStar::Bounce(sf::RenderWindow &window, double elapsed){
     }
 
     if(this->getGlobalBounds().left < 0){
+        this->setPosition(0, this->getPosition().y);
         this->speed_x = -speed_x;
     }
 
@@ -25,7 +26,6 @@ void DeathStar::Bounce(sf::RenderWindow &window, double elapsed){
 }
 
 void DeathStar::HP(){
-//    hp_bar.setSize(sf::Vector2f((float) GetHP()/100, 6));
     hp_bar.setFillColor(sf::Color::Red);
     hp_bar.setOutlineColor(sf::Color(153, 153, 153));
     hp_bar.setOutlineThickness(1);
@@ -34,4 +34,8 @@ void DeathStar::HP(){
 void DeathStar::HPdraw(){
     this->hp_bar.setPosition(this->getPosition().x, this->getPosition().y - 2);
     this->hp_bar.setSize(sf::Vector2f((float) this->GetHP()/3.15, 6));
-};
+}
+
+void DeathStar::SetHP(int x){
+    this->hp = x;
+}
