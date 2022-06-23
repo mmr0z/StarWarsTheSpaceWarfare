@@ -15,7 +15,7 @@ void About(){
         std::cerr<<"blad ladowania Starjedi.ttf"<<std::endl;
     }
 
-    sf::RenderWindow window(sf::VideoMode(420, 175), "Star Wars - The Space warfare", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(420, 350), "Star Wars - The Space warfare", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
 
     Button author;
@@ -23,7 +23,7 @@ void About(){
     author.setFillColor(sf::Color::Black);
     author.setOutlineColor(sf::Color::White);
     author.setOutlineThickness(0.8);
-    author.setString("author: maciej mroz \nindex: 151241 \npolitechnika poznanska \nair 2022, 2nd semester");
+    author.setString("author: maciej mroz \nindex: 151241 \npolitechnika poznanska \nair 2022, 2nd semester \n-------------------------------------------- \na - left, d - right \nspace - shoot, p - shop, \nenter - pause");
     author.setCharacterSize(25);
     author.setPosition(10, 10);
 
@@ -196,7 +196,7 @@ void Game(){
 
     sf::Sound proton_explosion;
     proton_explosion.setBuffer(buffer_proton_bomb_explosion);
-    proton_explosion.setVolume(10);
+    proton_explosion.setVolume(5);
 
     sf::Sound shot_right;
     shot_right.setBuffer(buffer_shot);
@@ -252,13 +252,6 @@ void Game(){
     DeathStar deathstar(texture_death_star);
 
     std::vector<std::unique_ptr<Opponents>> opponents;
-
-//    for(int i=0; i<10; i++){
-//        auto temp = std::make_unique<TieFighter>(texture_tie_fighter);
-//        temp->setPosition(10 + rand()%(window.getSize().x-50), -50);
-//        temp->setScale(0.12, 0.12);
-//        opponents.emplace_back(std::move(temp));
-//    }
 
     Button pause_text;
     pause_text.setFont(font);
@@ -630,7 +623,11 @@ void Game(){
 
         // DRAW
         // draw everything here...
-        window.draw(deathstar);
+
+        if(deathstar.GetHP() > 0){
+            window.draw(deathstar);
+        }
+
         deathstar.HPdraw();
         window.draw(deathstar.hp_bar);
         window.draw(player);
